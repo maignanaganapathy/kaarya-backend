@@ -1,11 +1,13 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
 import { APP_CONFIG } from './initializers/app';
 import { errorHandler, notFoundHandler } from './middlewares/error';
 import { requestLogger } from './middlewares/logger';
 import routes from './routes';
 import logger from './initializers/logger';
+import { swaggerSpec } from './initializers/swagger';
 
 const app: Application = express();
 
@@ -38,6 +40,19 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(requestLogger);
 
 /**
+ * Swagger API Documentation
+ */
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+    customSiteTitle: 'Kaarya API Documentation',
+    customCss: '.swagger-ui .topbar { display: none }',
+  })
+);
+
+/**
  * API Routes
  */
 app.use('/api', routes);
@@ -51,6 +66,7 @@ app.get('/', (req, res) => {
     message: 'Welcome to Kaarya API',
     version: '1.0.0',
     environment: APP_CONFIG.nodeEnv,
+    documentation: `http://localhost:${APP_CONFIG.port}/api-docs`,
   });
 });
 

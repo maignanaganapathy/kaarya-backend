@@ -20,6 +20,7 @@ const startServer = async () => {
       logger.info(`📝 Environment: ${APP_CONFIG.nodeEnv}`);
       logger.info(`🌐 API URL: http://localhost:${PORT}/api`);
       logger.info(`💚 Health check: http://localhost:${PORT}/api/health`);
+      logger.info(`📚 API Docs: http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);

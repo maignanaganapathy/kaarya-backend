@@ -1,4 +1,4 @@
-import logger from './logger';
+import logger from '../initializers/logger';
 
 interface AuditLogData {
   userId?: string;

@@ -1,0 +1,13 @@
+{
+    "server": {
+        "port": 5000
+    },
+    "cors": {
+        "origins": [
+            "https://yourdomain.com"
+        ]
+    },
+    "google": {
+        "redirectUri": "https://yourdomain.com/auth/google/callback"
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "server": {
+        "port": 5000
+    },
+    "jwt": {
+        "accessExpiry": "15m",
+        "refreshExpiry": "7d"
+    },
+    "cors": {
+        "origins": [
+            "http://localhost:5173"
+        ]
+    },
+    "google": {
+        "redirectUri": "http://localhost:5173/auth/google/callback"
+    }
+}

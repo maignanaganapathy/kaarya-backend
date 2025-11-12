@@ -1,11 +1,9 @@
-import config from 'config';
+import config from "config";
 
 export const APP_CONFIG = {
-  port: Number(process.env.PORT) || config.get<number>('server.port'),
-  nodeEnv: process.env.NODE_ENV || 'development',
-  corsOrigins:
-    process.env.ALLOWED_ORIGINS?.split(',') ||
-    config.get<string[]>('cors.origins'),
-  isDevelopment: process.env.NODE_ENV === 'development',
-  isProduction: process.env.NODE_ENV === 'production',
+  port: Number(process.env.PORT) || config.get<number>("server.port"),
+  nodeEnv: process.env.NODE_ENV || "development",
+  corsOrigins: ["http://localhost:5173", "https://kaarya.vercel.app"],
+  isDevelopment: process.env.NODE_ENV === "development",
+  isProduction: process.env.NODE_ENV === "production",
 };

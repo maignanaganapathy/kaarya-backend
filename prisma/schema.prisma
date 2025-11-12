@@ -9,15 +9,18 @@ datasource db {
 }
 
 model User {
-  id             String         @id @default(uuid())
-  email          String         @unique
-  name           String?
-  googleId       String         @unique
-  profilePicture String?
-  lastLogin      DateTime?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  refreshTokens  RefreshToken[]
+  id               String           @id @default(uuid())
+  email            String           @unique
+  name             String?
+  googleId         String           @unique
+  profilePicture   String?
+  lastLogin        DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  refreshTokens    RefreshToken[]
+  groupMemberships GroupUser[]
+  createdGroups    Group[]
+  quizSubmissions  QuizSubmission[]
 
   @@map("users")
 }
@@ -32,4 +35,106 @@ model RefreshToken {
 
   @@index([userId])
   @@map("refresh_tokens")
+}
+
+model Quiz {
+  id                 String                @id @default(uuid())
+  name               String
+  meta               Json // {type: "evaluative"|"feedback", max_attempts: number}
+  acceptingResponses Boolean               @default(true) @map("accepting_responses")
+  createdAt          DateTime              @default(now()) @map("created_at")
+  updatedAt          DateTime              @updatedAt @map("updated_at")
+  questions          Question[]
+  submissions        QuizSubmission[]
+  groupPermissions   QuizGroupPermission[]
+  inference          QuizInference?
+
+  @@map("quizzes")
+}
+
+model Question {
+  id           String   @id @default(uuid())
+  quizId       String   @map("quiz_id")
+  questionText String   @map("question_text")
+  options      Json // [{option_key, label, value}]
+  answerType   String   @map("answer_type") // "mcq", "scale"
+  meta         Json     @default("{}")
+  order        Int      @default(0)
+  createdAt    DateTime @default(now()) @map("created_at")
+  quiz         Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+  @@map("questions")
+}
+
+model Group {
+  id              String                @id @default(uuid())
+  name            String
+  description     String?
+  createdBy       String                @map("created_by")
+  createdAt       DateTime              @default(now()) @map("created_at")
+  groupUsers      GroupUser[]
+  quizPermissions QuizGroupPermission[]
+  creator         User                  @relation(fields: [createdBy], references: [id])
+
+  @@map("groups")
+}
+
+model GroupUser {
+  id       String   @id @default(uuid())
+  groupId  String   @map("group_id")
+  userId   String   @map("user_id")
+  role     String   @default("member") // "member", "admin"
+  joinedAt DateTime @default(now()) @map("joined_at")
+  group    Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
+  @@index([groupId])
+  @@map("group_users")
+}
+
+model QuizGroupPermission {
+  id         String   @id @default(uuid())
+  quizId     String   @map("quiz_id")
+  groupId    String   @map("group_id")
+  permission String // "attempt", "view", "edit"
+  createdAt  DateTime @default(now()) @map("created_at")
+  quiz       Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  group      Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([quizId, groupId, permission])
+  @@index([quizId])
+  @@index([groupId])
+  @@map("quiz_group_permissions")
+}
+
+model QuizSubmission {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  quizId      String    @map("quiz_id")
+  responses   Json // [{question_id, selected_option_key, answer}]
+  score       Int?
+  submittedAt DateTime? @map("submitted_at")
+  validated   Boolean   @default(false)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz        Quiz      @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([userId, quizId])
+  @@index([quizId])
+  @@map("quiz_submissions")
+}
+
+model QuizInference {
+  id             String   @id @default(uuid())
+  quizId         String   @unique @map("quiz_id")
+  inferenceLogic Json     @map("inference_logic") // {type: "minmax", rules: [{min, max, inference}]}
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  quiz           Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_inferences")
 }

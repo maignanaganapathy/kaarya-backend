@@ -1,7 +1,7 @@
 import config from 'config';
 
 export const APP_CONFIG = {
-  port: process.env.PORT || config.get<number>('server.port'),
+  port: Number(process.env.PORT) || config.get<number>('server.port'),
   nodeEnv: process.env.NODE_ENV || 'development',
   corsOrigins:
     process.env.ALLOWED_ORIGINS?.split(',') ||

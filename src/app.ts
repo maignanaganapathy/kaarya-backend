@@ -66,7 +66,7 @@ app.get('/', (req, res) => {
     message: 'Welcome to Kaarya API',
     version: '1.0.0',
     environment: APP_CONFIG.nodeEnv,
-    documentation: `http://localhost:${APP_CONFIG.port}/api-docs`,
+    documentation: `${req.protocol}://${req.get('host')}/api-docs`,
   });
 });
 

@@ -55,7 +55,7 @@ app.use(
 /**
  * API Routes
  */
-app.use('/api', routes);
+app.use('/', routes);
 
 /**
  * Root Route
